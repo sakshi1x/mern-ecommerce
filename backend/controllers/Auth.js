@@ -7,44 +7,65 @@ const { sanitizeUser } = require("../utils/SanitizeUser");
 const { generateToken } = require("../utils/GenerateToken");
 const PasswordResetToken = require("../models/PasswordResetToken");
 
-exports.signup=async(req,res)=>{
+
+
+exports.signup = async (req, res) => {
     try {
-        const existingUser=await User.findOne({email:req.body.email})
-        
-        // if user already exists
-        if(existingUser){
-            return res.status(400).json({"message":"User already exists"})
+        const { email, password } = req.body;
+
+        // Check if user already exists
+        const existingUser = await User.findOne({ email });
+        if (existingUser) {
+            return res.status(400).json({ message: "User already exists" });
         }
 
-        // hashing the password
-        const hashedPassword=await bcrypt.hash(req.body.password,10)
-        req.body.password=hashedPassword
+        // Password Security: Enforce strong password policy
+        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+        if (!passwordRegex.test(password)) {
+            return res.status(400).json({ 
+                message: "Password must be at least 8 characters long and include uppercase, lowercase, numbers, and special characters."
+            });
+        }
 
-        // creating new user
-        const createdUser=new User(req.body)
-        await createdUser.save()
+        // Hashing the password
+        const hashedPassword = await bcrypt.hash(password, 10);
 
-        // getting secure user info
-        const secureInfo=sanitizeUser(createdUser)
+        // Setting password expiry (e.g., expires in 90 days)
+        const passwordExpiryDate = new Date();
+        passwordExpiryDate.setDate(passwordExpiryDate.getDate() + 90);
 
-        // generating jwt token
-        const token=generateToken(secureInfo)
+        // Creating new user with password history and expiry date
+        const createdUser = new User({
+            ...req.body,
+            password: hashedPassword,
+            passwordHistory: [hashedPassword], // Initialize history with the first password
+            passwordLastChanged: new Date(),
+            passwordExpiry: passwordExpiryDate
+        });
 
-        // sending jwt token in the response cookies
-        res.cookie('token',token,{
-            sameSite:process.env.PRODUCTION==='true'?"None":'Lax',
-            maxAge:new Date(Date.now() + (parseInt(process.env.COOKIE_EXPIRATION_DAYS * 24 * 60 * 60 * 1000))),
-            httpOnly:true,
-            secure:process.env.PRODUCTION==='true'?true:false
-        })
+        await createdUser.save();
 
-        res.status(201).json(sanitizeUser(createdUser))
+        // Getting secure user info
+        const secureInfo = sanitizeUser(createdUser);
+
+        // Generating JWT token
+        const token = generateToken(secureInfo);
+
+        // Sending JWT token in response cookies
+        res.cookie("token", token, {
+            sameSite: process.env.PRODUCTION === "true" ? "None" : "Lax",
+            maxAge: parseInt(process.env.COOKIE_EXPIRATION_DAYS) * 24 * 60 * 60 * 1000,
+            httpOnly: true,
+            secure: process.env.PRODUCTION === "true"
+        });
+
+        res.status(201).json(sanitizeUser(createdUser));
 
     } catch (error) {
         console.log(error);
-        res.status(500).json({message:"Error occured during signup, please try again later"})
+        res.status(500).json({ message: "Error occurred during signup, please try again later" });
     }
-}
+};
 
 exports.login=async(req,res)=>{
     try {
@@ -197,7 +218,22 @@ exports.resetPassword=async(req,res)=>{
         // if user does not exists then returns a 404 response
         if(!isExistingUser){
             return res.status(404).json({message:"User does not exists"})
+
         }
+        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+        if (!passwordRegex.test(newPassword)) {
+            return res.status(400).json({
+                message: "Password must be at least 8 characters long and include uppercase, lowercase, numbers, and special characters."
+            });
+        }
+
+        // Prevent reusing previous passwords
+        for (const oldPassword of user.passwordHistory) {
+            if (await bcrypt.compare(newPassword, oldPassword)) {
+                return res.status(400).json({ message: "You cannot reuse your last passwords." });
+            }
+        }
+
 
         // fetches the resetPassword token by the userId
         const isResetTokenExisting=await PasswordResetToken.findOne({user:isExistingUser._id})

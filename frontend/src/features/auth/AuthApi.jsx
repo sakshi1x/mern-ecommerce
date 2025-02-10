@@ -1,17 +1,45 @@
 import {axiosi} from '../../config/axios'
+import axios from 'axios';
+function getCookie(name) {
+    console.log("cookoe",document.cookie)
+    let value = `; ${document.cookie}`;
+    let parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop().split(';').shift();
+    return null;
+}
+// When your app loads, fetch the CSRF token
 
+  
 export const signup=async(cred)=>{
     try {
-        const res=await axiosi.post("auth/signup",cred)
-        return res.data
+        // await fetchCsrfToken(); // Fetch the token first
+    
+        const csrfToken = getCookie("XSRF-TOKEN");
+        // const csrfToken = getCookie('XSRF-TOKEN');
+        if (csrfToken) {
+            return axios.post("https://localhost:8000/auth/signup", cred, {
+                headers: { "X-XSRF-TOKEN": csrfToken },
+                withCredentials: true // This ensures that cookies are sent with requests
+            });
+        }
+        else{ console.log("no token")}
+        
     } catch (error) {
         throw error.response.data
     }
 }
 export const login=async(cred)=>{
     try {
-        const res=await axiosi.post("auth/login",cred)
-        return res.data
+        const csrfToken = getCookie("XSRF-TOKEN");
+        // const csrfToken = getCookie('XSRF-TOKEN');
+        if (csrfToken) {
+            return axios.post("https://localhost:8000/auth/login", cred, {
+                headers: { "X-XSRF-TOKEN": csrfToken },
+                withCredentials: true // This ensures that cookies are sent with requests
+            });
+        }
+        else{ console.log("no token")}
+       
     } catch (error) {
         throw error.response.data
     }

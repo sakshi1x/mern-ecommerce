@@ -1,51 +1,4 @@
-## MERN Ecommerce: A Seamless Shopping Experience Powered by the MERN Stack, Redux Toolkit, and Material UI
 
-### ```Note✨: I have another amazing project on``` [end-to-end-encrypted-chat-application](https://github.com/RishiBakshii/mern-chat) ```using mern stack.```
-
-**MERN Ecommerce** is a full-stack application designed to transform your online shopping experience. Built with the MERN stack (MongoDB, Express.js, React, Node.js), it leverages Redux Toolkit for efficient state management and Material UI for a sleek, user-friendly interface. This project offers a robust platform for both users and admins, packed with essential features for a seamless experience.
-
-![ecommerce-homepage](https://github.com/RishiBakshii/mern-ecommerce/blob/main/frontend/src/assets/images/front.png?raw=true)
-<!-- ![ecommerce-banner](https://github.com/RishiBakshii/mern-ecommerce/blob/main/frontend/src/assets/images/banner4.jpg?raw=true) -->
-![ecommerce-banner](https://github.com/RishiBakshii/mern-ecommerce/blob/main/frontend/src/assets/images/banner3.jpg?raw=true)
-
-
-# **Features**
-
-### **User:**
-- **Product Reviews:**
-  - Write, edit, and delete reviews.
-  - Instant updates on ratings and star percentages.
-  
-- **Wishlist:**
-  - Add, remove, and annotate products with personalized notes.
-  
-- **Order Management:**
-  - Create new orders and view order history.
-  
-- **Profile Management:**
-  - Manage email, username, and multiple addresses.
-  
-- **Shopping Cart:**
-  - Add products, adjust quantities, and view subtotals.
-
-### **Admin:**
-- **Product Management:**
-  - Add, edit, delete, and soft-delete products.
-  - Manage product attributes like name and stock.
-  
-- **Order Management:**
-  - View and update order details and status.
-
-### **Security & User Experience:**
-- **Secure Authentication:**
-  - Login, signup, OTP verification, password reset, and logout.
-
-- **Intuitive Interface:**
-  - Powered by Material UI for a visually appealing and user-friendly experience.
-
-### **Scalability:**
-- **Built for Growth:**
-  - Scalable architecture to handle increasing user demands.
 
 
 # **Project Setup**
@@ -154,24 +107,3 @@ REACT_APP_BASE_URL="http://localhost:8000"
   email: demo@gmail.com
   pass: helloWorld@123
 ```
-
-- **Please Note**: While the demo account provides a convenient way to explore many features, it has some limitations:
-    - **Password Reset and OTP Verification**: Due to security reasons, the demo account uses a non-real email address. Therefore, password reset and OTP verification functionalities are not available for this account.
-
-    **What this means**:
-    - You cannot request a password reset or receive verification codes on the demo email address.
-    - To test password reset and OTP verification flows, you need to create a genuine account with a valid email address.
-
-    **What to do?**
-    - If you're primarily interested in exploring other functionalities like wishlist, cart, and order history, the demo account is sufficient.
-    - To test password reset and OTP verification, create a personal account with a valid email address.
-### Accessing the Application
-Once both servers are running, you can access them at the following URL's:
-- Backend: http://localhost:8000
-- Frontend: http://localhost:3000
-
-## **Bonus**
-Don't forget to star the repository and share your feedback!✨
-
-## Authors
-- [@RishiBakshii](https://github.com/RishiBakshii)
